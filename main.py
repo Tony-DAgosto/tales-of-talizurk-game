@@ -1,6 +1,8 @@
 import pygame
 from sys import exit
 
+#**# = note for future feature
+
 pygame.init()
 
 # CONSTANTS
@@ -10,6 +12,7 @@ screen = pygame.display.set_mode((1600,1000), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 player_rect = pygame.Rect((WORLD_WIDTH // 2,WORLD_HEIGHT // 2,65,65))
 speed = 8
+journal_rect = pygame.Rect((WORLD_WIDTH // 2,WORLD_HEIGHT // 2,350,350))
 
 # Dialogue font
 dialogue_font = pygame.font.Font("Fonts/Minecraftia-Regular.ttf", 40)
@@ -23,7 +26,8 @@ williard_give_scrap1_msg2 = dialogue_font.render("check your journal for your re
 nearby_npc = None
 active_task = None
 
-# Rocks
+# Rocks - #**# make generate randomly each time ran with rules
+# (size constraints, dont spawn on top of each other, leave big enough gap for player to walk anywhere. dont block objectives, etc.)
 landmark_list = [
     pygame.Rect(400, 400, 100, 100),
     pygame.Rect(500, 1400, 100, 100),
@@ -82,7 +86,7 @@ while run:
             pygame.quit()
             exit()
 
-        # Game state machine
+        # Game state machine for key press triggered events
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e and nearby_npc == "Williard":
                 game_state = "dialogue"
@@ -90,6 +94,17 @@ while run:
                 game_state = "working"
                 task1_obj = pygame.Rect(4900, 4900, 100, 100)
                 active_task = "Task 1"
+            if event.key == pygame.K_j:
+                game_state = "journal"
+            # DEBUG:
+            # -------------------------
+            if event.key == pygame.K_0:
+                # Print nearby npc, none if not near any
+                print("Nearby NPC: " + str(nearby_npc) + "\n")
+                # Print completed tasks list
+                print("Completed Tasks: " + str(completed_tasks) + "\n")
+                # Print collected scraps list
+                print("Collected Scraps: " + str(collected_scraps) + "\n")
 
     # **UPDATE PHASE**
     keys = pygame.key.get_pressed()
@@ -162,6 +177,8 @@ while run:
         game_state = "roaming"
     
     player_rect.clamp_ip(pygame.Rect(0,0,WORLD_WIDTH,WORLD_HEIGHT))
+    # test below
+    journal_rect.clamp_ip(pygame.Rect(0,0,WORLD_WIDTH,WORLD_HEIGHT))
 
     # Set up camera x & y offset
     camera_x = player_rect.centerx - (screen.get_width() // 2)
@@ -198,9 +215,10 @@ while run:
         pygame.draw.rect(screen, 'Yellow', draw_task1_obj)
 
     # WILLIARD INTERACTIONS
+    #-----------------------
     # If player within npc range -> display prompt to speak with them
     if game_state == "roaming" and nearby_npc == "Williard" and not ("Task 1" in completed_tasks):
-            screen.blit(npc1_e2start, ((screen.get_width() / 2) - (npc1_e2start.width / 2), 150)) # first npc, first popup
+        screen.blit(npc1_e2start, ((screen.get_width() / 2) - (npc1_e2start.width / 2), 150)) # first npc, first popup
 
     if game_state == "dialogue" and nearby_npc == "Williard":
         screen.blit(npc1_task_desc, ((screen.get_width() / 2) - (npc1_task_desc.width / 2), 150))
@@ -209,7 +227,7 @@ while run:
         screen.blit(williard_give_scrap1_msg1, ((screen.get_width() / 2) - (williard_give_scrap1_msg1.width / 2), 150))
         screen.blit(williard_give_scrap1_msg2, ((screen.get_width() / 2) - (williard_give_scrap1_msg2.width / 2), 150 + (williard_give_scrap1_msg2.height)))
 
-        # Williard vanish or otherwise be of no use anymore added here eventually
+        #**# Williard vanish or otherwise be of no use anymore added here eventually
 
     # Same as above, but only adds scrap 1 to collected_scraps list once
     if game_state == "roaming" and nearby_npc == "Williard" and ("Task 1" in completed_tasks) and not williard_done: 
@@ -219,15 +237,9 @@ while run:
     if "Task 1" in completed_tasks and (not (nearby_npc == "Williard")) and not collected_scraps:
         screen.blit(task1_obj_completion_msg1, ((screen.get_width() / 2) - (task1_obj_completion_msg1.width / 2), 150))
         screen.blit(task1_obj_completion_msg2, ((screen.get_width() / 2) - (task1_obj_completion_msg2.width / 2), 150 + (task1_obj_completion_msg2.height)))
-    
-    # DEBUG:
-    # -------------------------
-    # Print nearby npc, none if not near any
-    print(nearby_npc)
-    # Print completed tasks list
-    print(completed_tasks)
-    # Print collected scraps list
-    print(collected_scraps)
+
+    if game_state == "journal":
+        screen.blit()
 
     # Updates the screen with anything changed by user events
     pygame.display.update()
