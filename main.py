@@ -15,7 +15,7 @@ speed = 8
 journal_rect = pygame.Rect((WORLD_WIDTH // 2,WORLD_HEIGHT // 2,350,350))
 
 # Dialogue font
-dialogue_font = pygame.font.Font("Fonts/Minecraftia-Regular.ttf", 40)
+dialogue_font = pygame.font.Font("Fonts/Minecraft.otf", 40)
 npc1_e2start = dialogue_font.render("Press E to speak with Williard.", False, 'Black') # diff colors 4 testing
 npc1_task_desc = dialogue_font.render("Touch the rectangle on the far side of the map. (y/n)", False, 'Black')
 task1_obj_completion_msg1 = dialogue_font.render("You have completed Williard's task,", False, 'Black')
