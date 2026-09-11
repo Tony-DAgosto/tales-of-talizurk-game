@@ -70,7 +70,7 @@ npc_list = []
 
 npc_list.append(Williard)
 
-pygame.display.set_caption("The Story of Talizurk")
+pygame.display.set_caption("Tales of Talizurk")
 
 game_state = "roaming"
 

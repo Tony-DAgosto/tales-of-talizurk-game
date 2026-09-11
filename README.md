@@ -1,4 +1,4 @@
-This is a personal project where I am creating a simple single-player game in order to learn the basics of game development, challenge my understanding of Python, and reinforce good coding practices.
+This is a personal project where I am creating a simple single-player game in order to learn the basics of game development, challenge my understanding of Python, and reinforce good coding practives
 
 Running Game Instructions:
     1. Clone repo
