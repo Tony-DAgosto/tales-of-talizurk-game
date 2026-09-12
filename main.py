@@ -54,7 +54,8 @@ landmark_list = [
 ]
 
 # Scraps
-scrap1 = "Hear ye, hear ye, for now this region is settled in scorn!"
+scrap1_1 = "You must recant what you've proclaimed,"
+scrap1_2 = "Zernon lurks and shan't be slighted."
 
 # Collected Scraps List
 collected_scraps = []
@@ -141,9 +142,9 @@ while run:
         speed = 8
 
    # HORIZONTAL PLAYER MOVEMENT
-    if keys[pygame.K_a] and (game_state == "roaming" or game_state == "working"):
+    if keys[pygame.K_a] and (game_state == "roaming" or game_state == "working") and (journal == False):
         player_rect.x -= speed
-    if keys[pygame.K_d] and (game_state == "roaming" or game_state == "working"):
+    if keys[pygame.K_d] and (game_state == "roaming" or game_state == "working") and (journal == False):
         player_rect.x += speed
 
     # RESOLVE PLYR HORIZ MVMNT
@@ -163,9 +164,9 @@ while run:
                 player_rect.right = npc.rect.left
 
     # VERTICAL PLAYER MOVEMENT
-    if keys[pygame.K_w] and (game_state == "roaming" or game_state == "working"):
+    if keys[pygame.K_w] and (game_state == "roaming" or game_state == "working") and (journal == False):
         player_rect.y -= speed
-    if keys[pygame.K_s] and (game_state == "roaming" or game_state == "working"):
+    if keys[pygame.K_s] and (game_state == "roaming" or game_state == "working") and (journal == False):
         player_rect.y += speed
 
     # RESOLVE PLYR VERT MVMNT
@@ -229,10 +230,27 @@ while run:
     draw_player_rect = player_rect.move(-camera_x, -camera_y)
     pygame.draw.rect(screen, 'brown4', draw_player_rect)
 
-    # Draw journal
+    # Draw journal, print scraps if there are any
     if journal == True:
         pygame.draw.rect(screen, 'burlywood4', journal_rect)
         pygame.draw.rect(screen, 'burlywood3', journal_text_box)
+
+        if not not collected_scraps:
+            scrap1_1_render = dialogue_font.render(scrap1_1, False, 'Black')
+            scrap1_2_render = dialogue_font.render(scrap1_2, False, 'Black')
+
+            text_start_X = (journal_text_box.topleft[0] + 50)
+            text_start_Y = (journal_text_box.topleft[1] + 50)
+
+            screen.blit(scrap1_1_render, (text_start_X, (text_start_Y)))
+            screen.blit(scrap1_2_render, (text_start_X, (text_start_Y + scrap1_1_render.get_height())))
+
+        # if not not collected_scraps:
+            # for scrap in collected_scraps:
+                # scrap_render = dialogue_font.render(scrap, False, 'Black')
+                # offset = 0
+                # screen.blit(scrap_render, ((journal_text_box.topleft[0] + 50) + offset,(journal_text_box.topleft[1] + 50)))
+                # offset += scrap_render.get_width()
 
     # Draw objective for task 1
     if game_state == "working" and active_task == "Task 1":
@@ -256,12 +274,15 @@ while run:
 
     # Same as above, but only adds scrap 1 to collected_scraps list once
     if game_state == "roaming" and nearby_npc == "Williard" and ("Task 1" in completed_tasks) and not williard_done: 
-        collected_scraps.append(scrap1) # Add "reward" (Scrap 1) to list of collected scraps for journal
+        collected_scraps.append(scrap1_1) # Add "reward" (Scrap 1) to list of collected scraps for journal
+        collected_scraps.append(scrap1_2)
         williard_done = True
 
     if "Task 1" in completed_tasks and (not (nearby_npc == "Williard")) and not collected_scraps:
         screen.blit(task1_obj_completion_msg1, ((screen.get_width() / 2) - (task1_obj_completion_msg1.width / 2), 150))
         screen.blit(task1_obj_completion_msg2, ((screen.get_width() / 2) - (task1_obj_completion_msg2.width / 2), 150 + (task1_obj_completion_msg2.height)))
+
+    
 
     # Updates the screen with anything changed by user events
     pygame.display.update()
