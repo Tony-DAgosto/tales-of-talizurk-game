@@ -9,13 +9,16 @@ BASE_DIR = Path(__file__).resolve().parent
 pygame.init()
 
 # CONSTANTS
+pygame.display.set_caption("The Tales of Talizurk")
 WORLD_WIDTH = 5000
 WORLD_HEIGHT = 5000
 screen = pygame.display.set_mode((1600,1000), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 player_rect = pygame.Rect((WORLD_WIDTH // 2,WORLD_HEIGHT // 2,65,65))
 speed = 8
-journal_rect = pygame.Rect(200,100,1200,800)
+journal_rect = pygame.Rect(0,0, screen.width * 0.8, screen.height * 0.8) # X top-left, Y top-left, Width, Height
+journal_text_box = pygame.Rect(0,0, journal_rect.width * 0.84, journal_rect.height * 0.75) # X top-left, Y top-left, Width, Height
+journal_rect.center, journal_text_box.center = screen.get_rect().center, screen.get_rect().center
 
 # Dialogue font
 dialogue_font = pygame.font.Font("Fonts/Minecraft.otf", 40)
@@ -67,21 +70,17 @@ class NPC(pygame.sprite.Sprite):
         self.dialogue_popup = dialogue_popup
         self.hitbox = self.rect.inflate(200,200)
         self.name = name
-        
+
+# First NPC
 Williard = NPC(2000, 2600, 'Blue4', "Here is your first task", "Williard")
 
 npc_list = []
-
 npc_list.append(Williard)
 
-pygame.display.set_caption("The Tales of Talizurk")
-
+# Initial Booleans
 game_state = "roaming"
-
 williard_done = False
-
 journal = False
-
 run = True
 
 # Game Loop
@@ -91,6 +90,11 @@ while run:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+
+        if event.type == pygame.VIDEORESIZE:
+            journal_rect = pygame.Rect(0,0, screen.width * 0.8, screen.height * 0.8)
+            journal_text_box = pygame.Rect(0,0, journal_rect.width * 0.84, journal_rect.height * 0.75)
+            journal_rect.center, journal_text_box.center = screen.get_rect().center, screen.get_rect().center
 
         # Game state machine for key press triggered events
         if event.type == pygame.KEYDOWN:
@@ -116,6 +120,9 @@ while run:
                 print("Collected Scraps: " + str(collected_scraps) + "\n")
                 # Print game state
                 print("Game State: " + str(game_state))
+                # Print screen w and h
+                print("Screen Width" + str(screen.width))
+                print("Screen Hieght" + str(screen.height))
 
     # **UPDATE PHASE**
     keys = pygame.key.get_pressed()
@@ -222,9 +229,10 @@ while run:
     draw_player_rect = player_rect.move(-camera_x, -camera_y)
     pygame.draw.rect(screen, 'brown4', draw_player_rect)
 
+    # Draw journal
     if journal == True:
-        #draw_journal = journal_rect.move(-camera_x, -camera_y)
-        pygame.draw.rect(screen, 'burlywood2', journal_rect)
+        pygame.draw.rect(screen, 'burlywood4', journal_rect)
+        pygame.draw.rect(screen, 'burlywood3', journal_text_box)
 
     # Draw objective for task 1
     if game_state == "working" and active_task == "Task 1":
