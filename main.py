@@ -1,5 +1,8 @@
 import pygame
 from sys import exit
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 #**# = note for future feature
 
@@ -12,12 +15,13 @@ screen = pygame.display.set_mode((1600,1000), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 player_rect = pygame.Rect((WORLD_WIDTH // 2,WORLD_HEIGHT // 2,65,65))
 speed = 8
-journal_rect = pygame.Rect((WORLD_WIDTH // 2,WORLD_HEIGHT // 2,350,350))
+journal_rect = pygame.Rect(200,100,1200,800)
 
 # Dialogue font
 dialogue_font = pygame.font.Font("Fonts/Minecraft.otf", 40)
 npc1_e2start = dialogue_font.render("Press E to speak with Williard.", False, 'Black') # diff colors 4 testing
 npc1_task_desc = dialogue_font.render("Touch the rectangle on the far side of the map. (y/n)", False, 'Black')
+npc1_task_decline_msg = dialogue_font.render("Okay, I'll be waiting around here.", False, 'Black')
 task1_obj_completion_msg1 = dialogue_font.render("You have completed Williard's task,", False, 'Black')
 task1_obj_completion_msg2 = dialogue_font.render(" go back and see him for your reward.", False, 'Black')
 williard_give_scrap1_msg1 = dialogue_font.render("Congratulations on completing your first quest,", False, 'Gold')
@@ -76,6 +80,8 @@ game_state = "roaming"
 
 williard_done = False
 
+journal = False
+
 run = True
 
 # Game Loop
@@ -88,14 +94,17 @@ while run:
 
         # Game state machine for key press triggered events
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_e and nearby_npc == "Williard":
+            if (event.key == pygame.K_e) and (nearby_npc == "Williard") and 'Task 1' not in completed_tasks:
                 game_state = "dialogue"
-            if (event.key == pygame.K_y or event.key == pygame.K_n) and game_state == "dialogue" and nearby_npc == "Williard":
+            if (event.key == pygame.K_y) and (game_state == "dialogue") and (nearby_npc == "Williard"):
                 game_state = "working"
                 task1_obj = pygame.Rect(4900, 4900, 100, 100)
                 active_task = "Task 1"
+            elif (event.key == pygame.K_n) and (game_state == "dialogue") and (nearby_npc == "Williard"):
+                game_state = "roaming"
+
             if event.key == pygame.K_j:
-                game_state = "journal"
+                journal = not journal
             # DEBUG:
             # -------------------------
             if event.key == pygame.K_0:
@@ -105,6 +114,8 @@ while run:
                 print("Completed Tasks: " + str(completed_tasks) + "\n")
                 # Print collected scraps list
                 print("Collected Scraps: " + str(collected_scraps) + "\n")
+                # Print game state
+                print("Game State: " + str(game_state))
 
     # **UPDATE PHASE**
     keys = pygame.key.get_pressed()
@@ -207,7 +218,11 @@ while run:
 
     # Draw player
     draw_player_rect = player_rect.move(-camera_x, -camera_y)
-    pygame.draw.rect(screen, 'Brown4', draw_player_rect)
+    pygame.draw.rect(screen, 'brown4', draw_player_rect)
+
+    if journal == True:
+        #draw_journal = journal_rect.move(-camera_x, -camera_y)
+        pygame.draw.rect(screen, 'burlywood2', journal_rect)
 
     # Draw objective for task 1
     if game_state == "working" and active_task == "Task 1":
@@ -227,7 +242,7 @@ while run:
         screen.blit(williard_give_scrap1_msg1, ((screen.get_width() / 2) - (williard_give_scrap1_msg1.width / 2), 150))
         screen.blit(williard_give_scrap1_msg2, ((screen.get_width() / 2) - (williard_give_scrap1_msg2.width / 2), 150 + (williard_give_scrap1_msg2.height)))
 
-        #**# Williard vanish or otherwise be of no use anymore added here eventually
+    #**# Williard vanish or otherwise be of no use anymore added here eventually
 
     # Same as above, but only adds scrap 1 to collected_scraps list once
     if game_state == "roaming" and nearby_npc == "Williard" and ("Task 1" in completed_tasks) and not williard_done: 
@@ -237,9 +252,6 @@ while run:
     if "Task 1" in completed_tasks and (not (nearby_npc == "Williard")) and not collected_scraps:
         screen.blit(task1_obj_completion_msg1, ((screen.get_width() / 2) - (task1_obj_completion_msg1.width / 2), 150))
         screen.blit(task1_obj_completion_msg2, ((screen.get_width() / 2) - (task1_obj_completion_msg2.width / 2), 150 + (task1_obj_completion_msg2.height)))
-
-    if game_state == "journal":
-        screen.blit()
 
     # Updates the screen with anything changed by user events
     pygame.display.update()
