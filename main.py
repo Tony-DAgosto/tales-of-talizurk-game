@@ -119,7 +119,9 @@ while run:
 
     # **UPDATE PHASE**
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_ESCAPE]:
+    if keys[pygame.K_ESCAPE] and game_state == "dialogue":
+        game_state = "roaming"
+    elif keys[pygame.K_ESCAPE] and game_state == "roaming":
         pygame.quit()
         exit()
 
